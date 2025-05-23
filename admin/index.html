@@ -2,8 +2,39 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Content Manager</title>
+    <title>CMS</title>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+      window.onload = function () {
+        NetlifyCms.init({
+          config: {
+            backend: {
+              name: "github",
+              repo: "WillFincher/WillFincherSite",  // 👈 UPDATE THIS
+              branch: "main",
+              auth_type: "oauth"
+            },
+            media_folder: "images/uploads",
+            public_folder: "/images/uploads",
+            collections: [
+              {s
+                name: "blog",
+                label: "Blog",
+                folder: "posts",
+                create: true,
+                slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+                fields: [
+                  { label: "Title", name: "title", widget: "string" },
+                  { label: "Publish Date", name: "date", widget: "datetime" },
+                  { label: "Body", name: "body", widget: "markdown" }
+                ]
+              }
+            ]
+          }
+        });
+      };
+    </script>
   </head>
   <body>
   </body>
