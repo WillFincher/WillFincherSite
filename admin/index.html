@@ -2,41 +2,48 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>CMS</title>
+    <title>Content Manager</title>
     <script src="https://unpkg.com/netlify-cms@^2.10.192/dist/netlify-cms.js"></script>
-    <script>
-      window.CMS_MANUAL_INIT = true;
-      window.onload = function () {
-        window.CMS.init({
-          config: {
-            backend: {
-              name: "github",
-              repo: "WillFincher/WillFincherSite",
-              branch: "main",
-              auth_type: "oauth"
-            },
-            media_folder: "images/uploads",
-            public_folder: "/images/uploads",
-            collections: [
-              {
-                name: "blog",
-                label: "Blog",
-                folder: "posts",
-                create: true,
-                slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
-                fields: [
-                  { label: "Title", name: "title", widget: "string" },
-                  { label: "Publish Date", name: "date", widget: "datetime" },
-                  { label: "Body", name: "body", widget: "markdown" }
-                ]
-              }
-            ]
-          }
-        });
-      };
-    </script>
   </head>
   <body>
-    <div id="nc-root"></div> <!-- ✅ Needed by Netlify CMS -->
+    <!-- ✅ CMS root mount point -->
+    <div id="nc-root"></div>
+
+    <script>
+      window.CMS_MANUAL_INIT = true;
+
+      window.onload = function () {
+        if (window.CMS) {
+          window.CMS.init({
+            config: {
+              backend: {
+                name: "github",
+                repo: "WillFincher/WillFincherSite",
+                branch: "main",
+                auth_type: "oauth"
+              },
+              media_folder: "images/uploads",
+              public_folder: "/images/uploads",
+              collections: [
+                {
+                  name: "blog",
+                  label: "Blog",
+                  folder: "posts",
+                  create: true,
+                  slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+                  fields: [
+                    { label: "Title", name: "title", widget: "string" },
+                    { label: "Publish Date", name: "date", widget: "datetime" },
+                    { label: "Body", name: "body", widget: "markdown" }
+                  ]
+                }
+              ]
+            }
+          });
+        } else {
+          console.error("CMS not loaded properly");
+        }
+      };
+    </script>
   </body>
 </html>
