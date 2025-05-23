@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <title>CMS</title>
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    <script src="https://unpkg.com/netlify-cms@^2.10.192/dist/netlify-cms.js"></script>
     <script>
       window.CMS_MANUAL_INIT = true;
       window.onload = function () {
-        NetlifyCms.init({
+        window.CMS.init({
           config: {
             backend: {
               name: "github",
-              repo: "WillFincher/WillFincherSite",  // 👈 UPDATE THIS
+              repo: "WillFincher/WillFincherSite",  // ✅ Your repo
               branch: "main",
               auth_type: "oauth"
             },
