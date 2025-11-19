@@ -9,7 +9,8 @@ body {
 /* 👇 This is the key container that centers everything */
 main {
   max-width: 700px;
-  margin: 0 auto;           /* center horizontally */
+  margin: 0 auto;
+  /* center horizontally */
   padding: 2rem;
 }
 
@@ -54,8 +55,103 @@ blockquote {
 }
 
 [data-supascribe-feed] {
-  display:block;
-  min-height:200px;   /* room to show up */
-  margin:2rem auto;   /* keeps it centred */
+  display: block;
+  min-height: 200px;
+  /* room to show up */
+  margin: 2rem auto;
+  /* keeps it centred */
 }
 
+/* Blog Layout */
+.blog-container {
+  display: flex;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+.sidebar {
+  flex: 0 0 250px;
+  padding-right: 1rem;
+  border-right: 1px solid #333;
+}
+
+.blog-content {
+  flex: 1;
+  max-width: none;
+  /* Override main max-width */
+  padding: 0;
+  margin: 0;
+}
+
+/* Search Box */
+.search-box input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: #1a2639;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 4px;
+}
+
+/* Category List */
+.category-list {
+  list-style: none;
+  padding: 0;
+}
+
+.category-list li {
+  margin-bottom: 0.5rem;
+}
+
+.category-list a {
+  color: #ccc;
+  text-decoration: none;
+  display: block;
+  padding: 0.25rem 0;
+}
+
+.category-list a:hover,
+.category-list a.active {
+  color: #00bcd4;
+}
+
+.subcategory-list {
+  list-style: none;
+  padding-left: 1rem;
+  margin-top: 0.25rem;
+  font-size: 0.9em;
+}
+
+/* Blog Post */
+.blog-post {
+  margin-bottom: 3rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 2rem;
+}
+
+.post-meta {
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.post-meta .category {
+  margin-left: 1rem;
+  color: #00bcd4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .blog-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+  }
+}

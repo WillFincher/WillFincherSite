@@ -1,24 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>William's World</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <nav>
-    <a href="index.html">home</a>
-    <a href="resume.html">bio/resume</a>
-    <a href="blog.html">blog</a>
-    <a href="Contact.html">contact</a>
-  </nav>
 
-  <main>
-    <h1>📝 Blog</h1>
-    <p>Occasional Reflections, Observations, and Updates. I like to write about about how you should hold ideas.</p>
-    <div data-supascribe-embed-id="859115217402" data-supascribe-feed></div>
-  </main>
-<script src="https://js.supascribe.com/v1/loader/5mzbZTuw2td4mZk5lNdsbnH1Nqp1.js" async></script>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>William's Blog</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- MathJax for logical notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">home</a>
+        <a href="resume.html">bio/resume</a>
+        <a href="blog.html" class="active">blog</a>
+        <a href="substack.html">substack</a>
+        <a href="Contact.html">contact</a>
+    </nav>
+
+    <div class="blog-container">
+        <aside class="sidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search posts..." />
+            </div>
+
+            <h3>Categories</h3>
+            <ul class="category-list">
+                <li><a href="#" data-category="all" class="active">All</a></li>
+                <li>
+                    <a href="#" data-category="Philosophy">Philosophy</a>
+                    <ul class="subcategory-list">
+                        <li><a href="#" data-category="Philosophy:Mind">Mind</a></li>
+                        <li><a href="#" data-category="Philosophy:Religion">Religion</a></li>
+                        <li><a href="#" data-category="Philosophy:Logic">Logic</a></li>
+                        <li><a href="#" data-category="Philosophy:General">General</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" data-category="Law">Law</a></li>
+                <li><a href="#" data-category="Fiction">Fiction</a></li>
+                <li><a href="#" data-category="History">History</a></li>
+            </ul>
+        </aside>
+
+        <main class="blog-content" id="blogPosts">
+            <!-- Posts will be loaded here via JavaScript -->
+        </main>
+    </div>
+
+    <script>
+        let allPosts = [];
+
+        async function loadPosts() {
+            try {
+                const response = await fetch('posts.json');
+                allPosts = await response.json();
+                renderPosts(allPosts);
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('blogPosts').innerHTML = '<p>Error loading posts.</p>';
+            }
+        }
+
+        function renderPosts(posts) {
+            const container = document.getElementById('blogPosts');
+            container.innerHTML = '';
+
+            if (posts.length === 0) {
+                container.innerHTML = '<p>No posts found.</p>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const article = document.createElement('article');
+                article.className = 'blog-post';
+                article.innerHTML = `
+          <h2>${post.title}</h2>
+          <div class="post-meta">
+            <span class="date">${post.date}</span>
+            <span class="category">${post.category}</span>
+          </div>
+          <div class="post-content">${post.content}</div>
+        `;
+                container.appendChild(article);
+            });
+
+            // Re-render MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function filterPosts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeCategory = document.querySelector('.category-list a.active').dataset.category;
+
+            const filtered = allPosts.filter(post => {
+                const matchesSearch = post.title.toLowerCase().includes(searchTerm) ||
+                    post.content.toLowerCase().includes(searchTerm);
+
+                let matchesCategory = true;
+                if (activeCategory !== 'all') {
+                    if (activeCategory.includes(':')) {
+                        // Exact match for subcategories
+                        matchesCategory = post.category === activeCategory;
+                    } else {
+                        // Parent category matches if post category starts with "Parent"
+                        matchesCategory = post.category.startsWith(activeCategory);
+                    }
+                }
+
+                return matchesSearch && matchesCategory;
+            });
+
+            renderPosts(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterPosts);
+
+        document.querySelectorAll('.category-list a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.category-list a').forEach(a => a.classList.remove('active'));
+                e.target.classList.add('active');
+                filterPosts();
+            });
+        });
+
+        loadPosts();
+    </script>
 </body>
+
 </html>

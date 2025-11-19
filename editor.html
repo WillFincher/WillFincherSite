@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Blog Post Editor</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        .editor-container {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            height: 100vh;
+        }
+
+        .input-section,
+        .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        textarea {
+            flex: 1;
+            font-family: monospace;
+            padding: 1rem;
+            background: #1a2639;
+            color: white;
+            border: 1px solid #333;
+        }
+
+        .preview-section {
+            background: #0e1729;
+            border: 1px solid #333;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        input,
+        select {
+            padding: 0.5rem;
+            background: #1a2639;
+            color: white;
+            border: 1px solid #333;
+        }
+
+        button {
+            padding: 1rem;
+            background: #00bcd4;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #00acc1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="editor-container">
+        <div class="input-section">
+            <h2>Write Post</h2>
+            <input type="text" id="title" placeholder="Post Title" />
+            <select id="category">
+                <option value="Philosophy:General">Philosophy: General</option>
+                <option value="Philosophy:Mind">Philosophy: Mind</option>
+                <option value="Philosophy:Religion">Philosophy: Religion</option>
+                <option value="Philosophy:Logic">Philosophy: Logic</option>
+                <option value="Law">Law</option>
+                <option value="Fiction">Fiction</option>
+                <option value="History">History</option>
+            </select>
+            <textarea id="content"
+                placeholder="Write HTML content here... Use \( ... \) for inline math and \[ ... \] for block math."></textarea>
+            <button onclick="generateJSON()">Generate JSON</button>
+        </div>
+        <div class="preview-section">
+            <h2>Preview</h2>
+            <div id="preview"></div>
+        </div>
+    </div>
+
+    <script>
+        const titleInput = document.getElementById('title');
+        const categoryInput = document.getElementById('category');
+        const contentInput = document.getElementById('content');
+        const preview = document.getElementById('preview');
+
+        function updatePreview() {
+            preview.innerHTML = `
+        <h1>${titleInput.value}</h1>
+        <small>${categoryInput.value} - ${new Date().toLocaleDateString()}</small>
+        <hr/>
+        <div>${contentInput.value}</div>
+      `;
+            if (window.MathJax) {
+                MathJax.typesetPromise([preview]);
+            }
+        }
+
+        titleInput.addEventListener('input', updatePreview);
+        categoryInput.addEventListener('input', updatePreview);
+        contentInput.addEventListener('input', updatePreview);
+
+        function generateJSON() {
+            const post = {
+                id: Date.now(),
+                title: titleInput.value,
+                category: categoryInput.value,
+                date: new Date().toLocaleDateString(),
+                content: contentInput.value
+            };
+
+            const json = JSON.stringify(post, null, 2);
+            navigator.clipboard.writeText(json + ',');
+            alert('JSON copied to clipboard! Paste it into posts.json (inside the array).');
+        }
+    </script>
+</body>
+
+</html>
