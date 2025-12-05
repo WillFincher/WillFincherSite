@@ -4,130 +4,226 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>William's Blog</title>
+    <title>Blog - William Fincher</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- MathJax for logical notation -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
     <nav>
-        <a href="index.html">home</a>
-        <a href="resume.html">bio/resume</a>
-        <a href="blog.html" class="active">blog</a>
-        <a href="substack.html">substack</a>
-        <a href="Contact.html">contact</a>
+        <a href="blog.html" class="active">Blog</a>
+        <a href="index.html">Things I am working on</a>
+        <a href="about.html">About Will</a>
     </nav>
 
-    <div class="blog-container">
-        <aside class="sidebar">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search posts..." />
+    <div class="container">
+        <div class="blog-header">
+            <h1>Blog</h1>
+            <div class="search-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search posts..." />
             </div>
+        </div>
 
-            <h3>Categories</h3>
-            <ul class="category-list">
-                <li><a href="#" data-category="all" class="active">All</a></li>
-                <li>
-                    <a href="#" data-category="Philosophy">Philosophy</a>
-                    <ul class="subcategory-list">
-                        <li><a href="#" data-category="Philosophy:Mind">Mind</a></li>
-                        <li><a href="#" data-category="Philosophy:Religion">Religion</a></li>
-                        <li><a href="#" data-category="Philosophy:Logic">Logic</a></li>
-                        <li><a href="#" data-category="Philosophy:General">General</a></li>
-                    </ul>
-                </li>
-                <li><a href="#" data-category="Law">Law</a></li>
-                <li><a href="#" data-category="Fiction">Fiction</a></li>
-                <li><a href="#" data-category="History">History</a></li>
-            </ul>
-        </aside>
+        <div id="featuredPostContainer">
+            <!-- Featured post will be injected here -->
+        </div>
 
-        <main class="blog-content" id="blogPosts">
-            <!-- Posts will be loaded here via JavaScript -->
-        </main>
+        <div id="blogPosts">
+            <!-- Posts grouped by month will be injected here -->
+        </div>
     </div>
 
     <script>
         let allPosts = [];
+        const container = document.getElementById('blogPosts');
+        const featuredContainer = document.getElementById('featuredPostContainer');
+        const searchContainer = document.querySelector('.search-container');
+        const blogHeader = document.querySelector('.blog-header h1');
 
         async function loadPosts() {
             try {
                 const response = await fetch('posts.json');
+                if (!response.ok) throw new Error('Network response was not ok');
                 allPosts = await response.json();
-                renderPosts(allPosts);
+                renderPostList(allPosts);
             } catch (error) {
-                console.error('Error loading posts:', error);
-                document.getElementById('blogPosts').innerHTML = '<p>Error loading posts.</p>';
+                console.log('Fetch failed, using fallback data:', error);
+                // Fallback for testing
+                allPosts = [
+                    {
+                        "id": 1,
+                        "title": "Welcome to My New Blog",
+                        "category": "General",
+                        "date": "12/04/2025",
+                        "file": "posts/welcome.md",
+                        "content": "# Welcome\n\nThis is a fallback post because the file fetch failed."
+                    }
+                ];
+                renderPostList(allPosts);
             }
         }
 
-        function renderPosts(posts) {
-            const container = document.getElementById('blogPosts');
+        function renderPostList(posts) {
+            // Reset View
             container.innerHTML = '';
+            featuredContainer.innerHTML = '';
+            container.style.display = 'block';
+            featuredContainer.style.display = 'block';
+            searchContainer.style.display = 'block';
+            blogHeader.textContent = 'Blog';
+
+            // Remove back button if exists
+            const backBtn = document.getElementById('backButton');
+            if (backBtn) backBtn.remove();
 
             if (posts.length === 0) {
                 container.innerHTML = '<p>No posts found.</p>';
                 return;
             }
 
-            posts.forEach(post => {
-                const article = document.createElement('article');
-                article.className = 'blog-post';
-                article.innerHTML = `
-          <h2>${post.title}</h2>
-          <div class="post-meta">
-            <span class="date">${post.date}</span>
-            <span class="category">${post.category}</span>
-          </div>
-          <div class="post-content">${post.content}</div>
-        `;
-                container.appendChild(article);
+            // Sort posts by date (newest first)
+            posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const isSearching = document.getElementById('searchInput').value.length > 0;
+            let postsDisplay = [...posts];
+
+            // Featured Post (only if not searching)
+            if (!isSearching && postsDisplay.length > 0) {
+                const featured = postsDisplay[0];
+                postsDisplay = postsDisplay.slice(1);
+
+                const featuredHtml = `
+                    <div class="featured-post" onclick="viewPost(${featured.id})" style="cursor: pointer;">
+                        <span class="featured-label">Featured Post</span>
+                        <h2>${featured.title}</h2>
+                        <div class="post-meta">
+                            <span class="date">${featured.date}</span>
+                            <span class="category" style="margin-left: 1rem; color: var(--accent-color);">${featured.category}</span>
+                        </div>
+                    </div>
+                `;
+                featuredContainer.innerHTML = featuredHtml;
+            }
+
+            // Group remaining posts
+            const grouped = {};
+            postsDisplay.forEach(post => {
+                const date = new Date(post.date);
+                const monthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+                if (!grouped[monthYear]) grouped[monthYear] = [];
+                grouped[monthYear].push(post);
             });
 
-            // Re-render MathJax
-            if (window.MathJax) {
-                MathJax.typesetPromise();
+            // Render Groups
+            for (const [monthYear, monthPosts] of Object.entries(grouped)) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'month-group';
+
+                const monthHeader = document.createElement('span');
+                monthHeader.className = 'month-label';
+                monthHeader.textContent = monthYear;
+                groupDiv.appendChild(monthHeader);
+
+                monthPosts.forEach(post => {
+                    const postItem = document.createElement('div');
+                    postItem.className = 'post-item';
+                    postItem.style.cursor = 'pointer';
+                    postItem.onclick = () => viewPost(post.id);
+                    postItem.innerHTML = `
+                        <span class="post-title">${post.title}</span>
+                        <span class="post-date">${post.date}</span>
+                    `;
+                    groupDiv.appendChild(postItem);
+                });
+
+                container.appendChild(groupDiv);
+            }
+        }
+
+        async function viewPost(id) {
+            const post = allPosts.find(p => p.id === id);
+            if (!post) return;
+
+            // Hide List View elements
+            container.style.display = 'none';
+            featuredContainer.style.display = 'none';
+            searchContainer.style.display = 'none';
+
+            // Update Header
+            blogHeader.textContent = post.title;
+
+            // Create Post View Container
+            let postView = document.getElementById('postView');
+            if (!postView) {
+                postView = document.createElement('div');
+                postView.id = 'postView';
+                postView.className = 'blog-post-content';
+                document.querySelector('.container').appendChild(postView);
+            }
+            postView.style.display = 'block';
+
+            // Add Back Button
+            if (!document.getElementById('backButton')) {
+                const backBtn = document.createElement('a');
+                backBtn.id = 'backButton';
+                backBtn.href = '#';
+                backBtn.textContent = '← Back to Blog';
+                backBtn.style.display = 'inline-block';
+                backBtn.style.marginBottom = '2rem';
+                backBtn.onclick = (e) => {
+                    e.preventDefault();
+                    postView.style.display = 'none';
+                    renderPostList(allPosts);
+                };
+                document.querySelector('.blog-header').appendChild(backBtn);
+            }
+
+            // Fetch and Render Content
+            postView.innerHTML = '<p>Loading...</p>';
+
+            try {
+                let markdown = '';
+                if (post.file) {
+                    const res = await fetch(post.file);
+                    if (res.ok) {
+                        markdown = await res.text();
+                    } else {
+                        markdown = post.content || 'Error loading file.';
+                    }
+                } else {
+                    markdown = post.content || '';
+                }
+
+                postView.innerHTML = marked.parse(markdown);
+
+                // Re-render MathJax
+                if (window.MathJax) MathJax.typesetPromise();
+
+            } catch (e) {
+                postView.innerHTML = '<p>Error loading post content.</p>';
+                console.error(e);
             }
         }
 
         function filterPosts() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const activeCategory = document.querySelector('.category-list a.active').dataset.category;
-
-            const filtered = allPosts.filter(post => {
-                const matchesSearch = post.title.toLowerCase().includes(searchTerm) ||
-                    post.content.toLowerCase().includes(searchTerm);
-
-                let matchesCategory = true;
-                if (activeCategory !== 'all') {
-                    if (activeCategory.includes(':')) {
-                        // Exact match for subcategories
-                        matchesCategory = post.category === activeCategory;
-                    } else {
-                        // Parent category matches if post category starts with "Parent"
-                        matchesCategory = post.category.startsWith(activeCategory);
-                    }
-                }
-
-                return matchesSearch && matchesCategory;
-            });
-
-            renderPosts(filtered);
+            const filtered = allPosts.filter(post => post.title.toLowerCase().includes(searchTerm));
+            renderPostList(filtered);
         }
 
         document.getElementById('searchInput').addEventListener('input', filterPosts);
-
-        document.querySelectorAll('.category-list a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.querySelectorAll('.category-list a').forEach(a => a.classList.remove('active'));
-                e.target.classList.add('active');
-                filterPosts();
-            });
-        });
-
         loadPosts();
     </script>
 </body>
