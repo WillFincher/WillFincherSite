@@ -1,0 +1,47 @@
+.header {
+    margin: 4rem 0;
+    text-align: center;
+}
+
+.list {
+    max-width: 800px;
+    margin: 0 auto 4rem;
+}
+
+.item {
+    border-bottom: 1px solid var(--border-color);
+    padding: 2rem 0;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.itemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.item h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+}
+
+.status {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.in-progress {
+    background: rgba(0, 112, 243, 0.1);
+    color: #0070f3;
+}
+
+.planning {
+    background: rgba(245, 166, 35, 0.1);
+    color: #f5a623;
+}
