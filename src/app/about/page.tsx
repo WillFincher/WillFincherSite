@@ -6,8 +6,7 @@ export default function About() {
             <div className={styles.content}>
                 <h1>About Will</h1>
                 <p>
-                    Hello! I'm Will Fincher. I'm a developer passionate about building
-                    beautiful and functional web applications.
+                    Hello! I'm Will Fincher. I'm a Law Student and work in refugee services!
                 </p>
                 <p>
                     I specialize in React, Next.js, and modern web technologies. I love
